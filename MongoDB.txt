@@ -1,0 +1,122 @@
+########
+MongoDB:
+########
+
+database => commands
+----------------------
+	use testdb
+	db
+	db.testcollection.insert({"name":"arjun"})
+	show dbs
+	db.dropDatabase()
+	show dbs
+
+collection => commands
+----------------------
+	show dbs
+	use myTest
+
+	db.createCollection("Test")
+	show collections
+
+	db.newcollection.insert({"name":"arjun"})
+	show collections
+
+	db.newcollection.drop()
+	show collections
+
+document => commands
+--------------------
+	use company
+	db.employees.insert(
+	{
+	"EmpNo":"1",
+	"FirstName":"Andrew",
+	"LastName":"Neil",
+	"Age":"30",
+	"Gender":"Male",
+	"Skill":"MongoDB",
+	"Phone":"408-1234567",
+	"Email":"Andrew.Neil@gmail.com",
+	"Salary":"80000"
+	})
+
+Fetch documents:
+----------------
+	db.getCollection("employees").find({})
+	db.employees.find()
+	db.employees.findOne()
+	db.employees.find({"EmpNo":"2"})
+	db.employees.find({"Age" : {$lt: "30"}})
+	db.employees.find({"Age": {$lte: "30"}})
+	db.employees.find({"Age": {$gt: "30"}})
+	db.employees.find({"Age": {$gte: "30"}})
+	db.employees.find({"Age": {$ne: "30"}})
+
+Logical Operations:
+-------------------
+	db.employees.find().pretty()
+	db.employees.find({"Skill":"MongoDB"}).pretty()
+	db.employees.find({"Skill":"MongoDB", "Salary":"80000"}).pretty()
+	db.employees.find({$or:[{"Skill":"MongoDB"}, {"Salary":"100000"}]}).pretty()
+	db.employees.find({ "Skill":"MongoDB", $or:[{"Salary":"80000"}, {"Salary":"85000"}]}).pretty()
+
+Update Documents:
+-----------------
+	db.employees.find().pretty()
+	db.employees.update(
+		{"_id": ObjectId("5d67dfac3383556f286558fb")},
+		{$set: {"Salary":"100000"}}
+	)
+		
+	db.employees.update(
+		{"Skill": "MongoDB"},
+		{$set: {"Salary":"150000"}},
+		{multi: true}
+	)
+
+Delete Document:
+----------------
+	db.employees.find().pretty()
+	db.employees.remove({
+		"_id": ObjectId("5d67dfac3383556f286558fb")
+	})
+
+	db.employees.remove({
+		"Skill": "MongoDB"
+	}, 1)
+	
+Selecting Fields:
+-----------------
+	db.employees.find().pretty()
+	db.employees.find({}, {"FirstName": 1, "_id": 0, "LastName": 1}).pretty()
+
+limit, skip & sort:
+-------------------
+	db.employees.find().pretty()
+	db.employees.find({},{"FirstName":1, "LastName":1, "_id": 0}).pretty()
+	db.employees.find({},{"FirstName":1, "EmpNo":1, "_id": 0}).pretty().limit(5)
+	db.employees.find({},{"FirstName":1, "EmpNo":1, "_id": 0}).pretty().skip(3)
+	db.employees.find({},{"FirstName":1, "EmpNo":1, "_id": 0}).pretty().skip(3).limit(3)
+	db.employees.find({},{"FirstName":1, "EmpNo":1, "_id": 0}).pretty().sort({"FirstName": -1})
+
+Indexes:
+--------
+	db.employees.find().pretty()
+
+	db.employees.getIndexes()
+	db.employees.createIndex({"Email": 1})
+	db.employees.dropIndex({"Email": 1})
+	
+Aggregate:
+----------
+	db.employees.find().pretty()
+
+	db.employees.aggregate([($group: (_id: "$Gender",Total: ($sum:1)))])
+	db.employees.aggregate([($group: (_id: "$Gender",MaxAge: ($max:"$Age")))])
+	db.employees.aggregate([($group: (_id: "$Gender",MinAge: ($min:"$Age")))])
+
+Backup & Restore:
+----------------
+	mongodump --db myTest --collection employees
+	mongorestore --db myTest --collection employees dump/company/newcollection.bson
